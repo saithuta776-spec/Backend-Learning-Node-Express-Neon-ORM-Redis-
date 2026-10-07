@@ -1,10 +1,33 @@
-node_modules/
+# Environment variables
 .env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Build output
 dist/
+
+# Uploaded files
+uploads/images/*
+uploads/optimize/*
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# OS files
 .DS_Store
 
-.claude/
-.agents/
-.windsurf/
-.cursor/
-.devin/
+# VS Code
+.vscode/
+
+# Prisma
+prisma/generated/
+
+# Temporary files
+tmp/
+temp/
