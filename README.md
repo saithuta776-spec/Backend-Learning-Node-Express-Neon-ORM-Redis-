@@ -1,23 +1,87 @@
-# Backend Template — Express + TypeScript + Prisma 7 + Neon
+# Backend Learning — Node.js, Express, TypeScript, Prisma, Neon & Redis
 
-A reusable backend starter template built with **Node.js, Express, TypeScript, Prisma 7, and PostgreSQL hosted on Neon**.
+This repository is my personal backend development learning project. I use it to learn, practice, experiment with, and continuously improve backend development concepts by building a practical REST API with modern Node.js technologies.
 
-The purpose of this repository is to provide a clean backend foundation that can be cloned and reused for future projects without repeating the complete backend setup process.
+The project is developed incrementally, so the codebase will continue to change as I learn new concepts and add new features.
 
-## Tech Stack
+---
 
-* **Node.js** — JavaScript runtime for the backend
-* **Express** — Backend web framework
-* **TypeScript** — Type-safe JavaScript
-* **Prisma 7** — ORM for database access
-* **PostgreSQL** — Relational database
-* **Neon** — Cloud-hosted PostgreSQL database
-* **tsx** — Runs TypeScript during development
+## 🎯 Purpose
 
-## Project Structure
+The main purpose of this repository is to learn backend development through practical implementation rather than only studying individual concepts.
+
+Throughout the project, I am learning and practicing:
+
+* Node.js and Express
+* TypeScript
+* REST API development
+* PostgreSQL
+* Neon Serverless PostgreSQL
+* Prisma ORM
+* Prisma Migrations
+* Authentication and authorization
+* JWT and HTTP-only cookies
+* Middleware
+* File uploads
+* Image processing
+* Redis
+* BullMQ
+* Background workers and job queues
+* Internationalization (i18n)
+* Error handling
+* API structure and project organization
+
+The repository is continuously updated as new concepts are learned and implemented.
+
+---
+
+## 🛠️ Technologies
+
+### Backend
+
+* Node.js
+* Express
+* TypeScript
+
+### Database
+
+* PostgreSQL
+* Neon
+* Prisma ORM
+
+### Authentication
+
+* JSON Web Tokens (JWT)
+* HTTP-only cookies
+* Access tokens
+* Refresh tokens
+* Role-based authorization
+
+### File & Image Processing
+
+* Multer
+* Sharp
+
+### Background Jobs
+
+* Redis
+* BullMQ
+* Redis-backed job queues
+* Background workers
+
+### Development Tools
+
+* Git
+* GitHub
+* VS Code
+* Docker
+
+---
+
+## 📁 Project Structure
 
 ```text
-template-prisma-7/
+furniture/
 │
 ├── prisma/
 │   ├── migrations/
@@ -25,45 +89,382 @@ template-prisma-7/
 │   └── seed.ts
 │
 ├── src/
-│   ├── generated/
-│   │   └── prisma/
-│   ├── lib/
-│   │   └── prisma.ts
-│   ├── index.ts
-│   └── script.ts
+│   │
+│   ├── config/
+│   │   └── errorCode.ts
+│   │
+│   ├── controllers/
+│   │   ├── admin/
+│   │   ├── api/
+│   │   └── authController.ts
+│   │
+│   ├── jobs/
+│   │   ├── queues/
+│   │   │   └── imageQueue.ts
+│   │   │
+│   │   └── workers/
+│   │       └── imageWorker.ts
+│   │
+│   ├── locales/
+│   │   ├── en/
+│   │   └── mm/
+│   │
+│   ├── middlewares/
+│   │   ├── auth.ts
+│   │   ├── authorise.ts
+│   │   ├── maintenance.ts
+│   │   └── uploadFilde.ts
+│   │
+│   ├── routes/
+│   │   └── v1/
+│   │
+│   ├── services/
+│   │
+│   ├── type/
+│   │
+│   ├── utlis/
+│   │
+│   ├── app.ts
+│   └── index.ts
 │
-├── .env
+├── .env.example
 ├── .gitignore
 ├── package.json
 ├── package-lock.json
-├── prisma.config.ts
 └── tsconfig.json
 ```
 
-## Requirements
+---
 
-Before using this template, install:
+## 🏗️ Current Architecture
 
-* Node.js
-* npm
-* A Neon account
-* Git
+The project follows a layered backend structure:
 
-No local PostgreSQL installation is required because the database is hosted by Neon.
-
-## Installation
-
-Clone the repository:
-
-```bash
-git clone git@github.com:saithuta776-spec/Backend-Template-Express-TypeScript-Prisma-7-Neon.git
+```text
+Client
+  │
+  ▼
+Routes
+  │
+  ▼
+Middleware
+  │
+  ▼
+Controllers
+  │
+  ▼
+Services
+  │
+  ▼
+Prisma ORM
+  │
+  ▼
+Neon PostgreSQL
 ```
 
-Enter the project:
+For image processing, the project also uses a background job system:
+
+```text
+Client
+  │
+  ▼
+Upload Controller
+  │
+  ▼
+BullMQ Queue
+  │
+  ▼
+Redis
+  │
+  ▼
+BullMQ Worker
+  │
+  ▼
+Sharp
+  │
+  ▼
+Optimized Image
+```
+
+Redis acts as the backing store and coordination system for BullMQ. BullMQ provides the queue and worker functionality.
+
+---
+
+## 🔐 Environment Variables
+
+Create a `.env` file in the project root.
+
+Example:
+
+```env
+DATABASE_URL="your_neon_database_url"
+
+JWT_SECRET="your_jwt_secret"
+
+REDIS_HOST=localhost
+REDIS_PORT=6379
+```
+
+The real `.env` file is intentionally excluded from GitHub because it contains sensitive information.
+
+A safe `.env.example` file is included in the repository so that the required environment variables can be understood without exposing secrets.
+
+---
+
+## 🐘 PostgreSQL & Neon
+
+The project uses PostgreSQL as its relational database.
+
+The database is hosted using Neon, allowing the application to connect to a cloud PostgreSQL database without requiring a local PostgreSQL server.
+
+Prisma is used as the ORM for:
+
+* Database schema management
+* Queries
+* Relationships
+* Migrations
+* Type-safe database access
+
+---
+
+## 🔴 Redis
+
+Redis is used as the infrastructure behind the BullMQ background job system.
+
+For local development, Redis runs inside Docker.
+
+Start the Redis container:
 
 ```bash
-cd Backend-Template-Express-TypeScript-Prisma-7-Neon
+docker start redis
 ```
+
+If the container has not been created yet:
+
+```bash
+docker run -d \
+  --name redis \
+  -p 6379:6379 \
+  redis:8
+```
+
+Check whether Redis is running:
+
+```bash
+docker ps
+```
+
+Test Redis:
+
+```bash
+docker exec -it redis redis-cli
+```
+
+Then:
+
+```text
+PING
+```
+
+Expected response:
+
+```text
+PONG
+```
+
+Stop Redis when finished:
+
+```bash
+docker stop redis
+```
+
+Start it again later:
+
+```bash
+docker start redis
+```
+
+---
+
+## ⚙️ BullMQ Background Jobs
+
+BullMQ is used to process tasks asynchronously.
+
+For example, image optimization does not need to block the HTTP request while Sharp processes the image.
+
+The application adds an image optimization job to the queue:
+
+```text
+Controller
+    │
+    ▼
+Image Queue
+    │
+    ▼
+Redis
+    │
+    ▼
+Image Worker
+    │
+    ▼
+Sharp
+```
+
+The queue and worker use the same queue name:
+
+```text
+imageQueue
+```
+
+The producer adds a job such as:
+
+```text
+optimize-image
+```
+
+with data containing the uploaded image path and output filename.
+
+The worker receives the job and uses Sharp to resize and convert the image to WebP.
+
+---
+
+## 🖼️ Image Processing
+
+Uploaded images are initially stored using Multer.
+
+The original image is stored under:
+
+```text
+uploads/images/
+```
+
+The optimized image is generated under:
+
+```text
+uploads/optimize/
+```
+
+The worker currently uses Sharp to:
+
+* Resize images
+* Convert images to WebP
+* Reduce image quality/file size
+
+Example processing flow:
+
+```text
+Uploaded JPEG
+      │
+      ▼
+uploads/images/
+      │
+      ▼
+BullMQ Job
+      │
+      ▼
+Redis
+      │
+      ▼
+Image Worker
+      │
+      ▼
+Sharp
+      │
+      ├── Resize: 200 × 200
+      ├── Convert: WebP
+      └── Quality: 50
+      │
+      ▼
+uploads/optimize/
+```
+
+Uploaded files are excluded from Git using `.gitignore`.
+
+---
+
+## 🔑 Authentication
+
+The project includes JWT-based authentication.
+
+The authentication system is being developed around:
+
+* Access tokens
+* Refresh tokens
+* HTTP-only cookies
+* Authentication middleware
+* Role-based authorization
+
+The project also separates authentication and authorization responsibilities.
+
+```text
+Authentication
+     │
+     └── "Who are you?"
+
+Authorization
+     │
+     └── "Are you allowed to do this?"
+```
+
+---
+
+## 👥 Roles & Authorization
+
+The backend supports role-based access control.
+
+Example roles include:
+
+```text
+ADMIN
+USER
+AUTHOR
+```
+
+Authorization middleware can restrict access to particular routes based on the user's role.
+
+Example concept:
+
+```text
+Request
+  │
+  ▼
+Authentication
+  │
+  ▼
+User identified
+  │
+  ▼
+Authorization
+  │
+  ├── Allowed ──► Controller
+  │
+  └── Denied ───► Error response
+```
+
+---
+
+## 🌍 Internationalization
+
+The project includes multiple language translations.
+
+Current languages include:
+
+```text
+English
+Myanmar
+```
+
+Translation files are stored under:
+
+```text
+src/locales/
+```
+
+This allows application messages to be separated from the application logic.
+
+---
+
+## 🧪 Development
 
 Install dependencies:
 
@@ -71,199 +472,145 @@ Install dependencies:
 npm install
 ```
 
-## Environment Variables
-
-Create a `.env` file in the project root:
-
-```bash
-touch .env
-```
-
-Add your Neon PostgreSQL connection string:
-
-```env
-DATABASE_URL="your-neon-postgresql-connection-string"
-```
-
-Do not commit `.env` to GitHub.
-
-## Prisma Setup
-
-Generate the Prisma Client:
-
-```bash
-npx prisma generate
-```
-
-Apply the existing migrations to your database:
-
-```bash
-npx prisma migrate deploy
-```
-
-For local development when creating a new migration:
-
-```bash
-npx prisma migrate dev --name init
-```
-
-## Database Seeding
-
-Run the seed script:
-
-```bash
-npx prisma db seed
-```
-
-The seed file is located at:
-
-```text
-prisma/seed.ts
-```
-
-## Development
-
 Start the development server:
 
 ```bash
 npm run dev
 ```
 
-The server runs on:
-
-```text
-http://localhost:5000
-```
-
-## Testing the Database Connection
-
-Run:
+Start the BullMQ image worker:
 
 ```bash
-npx tsx src/script.ts
+npm run worker
 ```
 
-This executes a simple Prisma query and displays the users stored in the PostgreSQL database.
-
-## Prisma Studio
-
-To open Prisma Studio:
-
-```bash
-npx prisma studio
-```
-
-Then open:
-
-```text
-http://localhost:5555
-```
-
-Prisma Studio allows you to view and manage your database records through a browser interface.
-
-Press `Control + C` in the terminal to stop Prisma Studio.
-
-## Build
-
-Compile the TypeScript project:
+Build the TypeScript project:
 
 ```bash
 npm run build
 ```
 
-The compiled JavaScript files are generated inside:
-
-```text
-dist/
-```
-
-## Production Start
-
-After building the project:
+Start the compiled application:
 
 ```bash
 npm start
 ```
 
-This runs:
+---
 
-```bash
-node dist/index.js
+## 🐳 Redis Development Setup
+
+The local development environment can be thought of as:
+
+```text
+MacBook
+│
+├── Node.js / Express
+│       │
+│       ├── REST API
+│       └── BullMQ
+│
+└── Docker Desktop
+        │
+        └── Redis Container
+                │
+                └── Port 6379
 ```
 
-## Available Scripts
+The application connects to Redis through:
 
-| Command                                | Purpose                                         |
-| -------------------------------------- | ----------------------------------------------- |
-| `npm run dev`                          | Start development server with automatic restart |
-| `npm run build`                        | Compile TypeScript into JavaScript              |
-| `npm start`                            | Run the compiled production server              |
-| `npx prisma generate`                  | Generate Prisma Client                          |
-| `npx prisma migrate dev --name <name>` | Create and apply a development migration        |
-| `npx prisma migrate deploy`            | Apply existing migrations                       |
-| `npx prisma db seed`                   | Seed the database                               |
-| `npx prisma studio`                    | Open Prisma Studio                              |
-| `npx tsx src/script.ts`                | Run the database test script                    |
-
-## Adding Packages for Individual Projects
-
-This template intentionally contains only the core backend technologies.
-
-Additional packages can be installed when a particular project requires them.
-
-For example, CORS:
-
-```bash
-npm install cors
-npm install -D @types/cors
+```env
+REDIS_HOST=localhost
+REDIS_PORT=6379
 ```
 
-Jest and Supertest:
+---
 
-```bash
-npm install -D jest ts-jest supertest @types/jest @types/supertest
-```
+## 📚 Learning Progress
 
-Authentication:
+This repository is intentionally developed step by step.
 
-```bash
-npm install bcrypt jsonwebtoken
-npm install -D @types/bcrypt @types/jsonwebtoken
-```
+### Completed / Practiced
 
-Other commonly used packages such as Helmet, Morgan, Multer, Express Validator, and Express Rate Limit can also be added according to the requirements of the individual project.
+* [x] Node.js fundamentals
+* [x] Express REST API
+* [x] TypeScript
+* [x] Project structure
+* [x] Prisma ORM
+* [x] PostgreSQL
+* [x] Neon PostgreSQL
+* [x] Prisma migrations
+* [x] Database relationships
+* [x] Database seeding
+* [x] JWT authentication
+* [x] HTTP-only cookies
+* [x] Access and refresh tokens
+* [x] Authentication middleware
+* [x] Role-based authorization
+* [x] File uploads with Multer
+* [x] Image processing with Sharp
+* [x] Redis with Docker
+* [x] BullMQ queues
+* [x] BullMQ workers
+* [x] Background image processing
+* [x] WebP image optimization
+* [x] Internationalization
+* [x] Git and GitHub workflow
 
-## Reusing This Template
+### Currently Learning
 
-For a new backend project:
+* [ ] More advanced Redis usage
+* [ ] Advanced BullMQ features
+* [ ] Job retries and failure handling
+* [ ] Background jobs
+* [ ] Redis caching
+* [ ] WebSockets
+* [ ] Audit logs
+* [ ] Dockerizing the complete application
+* [ ] CI/CD
+* [ ] Cloud deployment
+* [ ] Monitoring and logging
+* [ ] Production backend architecture
 
-1. Clone this repository.
-2. Change the project name in `package.json`.
-3. Create a new Neon PostgreSQL database.
-4. Replace `DATABASE_URL` in `.env`.
-5. Modify `prisma/schema.prisma` for the new project's database models.
-6. Generate Prisma Client.
-7. Create migrations for the new schema.
-8. Update `prisma/seed.ts` if seed data is required.
-9. Add additional packages required by the project.
-10. Build and test the application.
+---
 
-Example:
+## 🚀 Future Improvements
 
-```bash
-git clone git@github.com:saithuta776-spec/Backend-Template-Express-TypeScript-Prisma-7-Neon.git my-new-project
+As my backend knowledge grows, I plan to experiment with:
 
-cd my-new-project
+* Redis caching
+* Job retry strategies
+* Scheduled/background jobs
+* WebSockets
+* Real-time notifications
+* Audit logging
+* Rate limiting
+* Advanced validation
+* Docker
+* CI/CD pipelines
+* Cloud deployment
+* Application monitoring
+* Better error handling
+* Automated testing
+* API documentation
+* Production-ready security practices
 
-npm install
-```
+---
 
-Then create a new `.env` file with the new Neon database connection string.
+## 📌 Important Note
 
-## Important
+This repository is primarily a **learning and experimentation project**.
 
-Never commit your `.env` file.
+The architecture and implementation will continue to evolve as I learn new backend concepts. Some implementations may be refactored or replaced with better approaches later.
 
-Your Neon database connection string contains credentials and should remain private.
+The goal is not simply to create a finished application, but to understand **why backend technologies work, how they interact, and how to build larger systems step by step.**
 
-This repository is intended to be a **starting template**, not a complete application. Project-specific functionality such as authentication, validation, testing, security middleware, file uploads, and API routes should be added according to the requirements of each project.
+---
+
+## 👨‍💻 Author
+
+**Sai Thuta Hlaing**
+
+GitHub:
+
+`https://github.com/saithuta776-spec`
